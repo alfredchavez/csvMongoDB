@@ -1,14 +1,17 @@
 #include <iostream>
-#include "../libs/csvcollection/inc/csvcollection.h"
+#include "csvcollection.h"
 
-int main() {
+int main(int argc, char** argv) {
+    if(argc < 2){
+        std::cout << "There is not csv file to process" << std::endl;
+        return 1;
+    }
     mongo::client::initialize();
-    std::string database, collection, file;
-    database = "somedb";
-    collection = "somecoll";
-    file = "/home/alfred/CLionProjects/csvMongoDB/res/test.csv";
+    std::string database, collection, file, file2;
+    file  = std::string(argv[1]);
+    file2 = "../res/application.properties";
     csvcollection csvcollection1;
-    csvcollection1.set_parameters_connection(database,collection);
+    csvcollection1.set_parameters_connection(file2);
     csvcollection1.populate_from_csv(file);
     return 0;
 }

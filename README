@@ -3,3 +3,21 @@
 ================================================
 
 Populates a collection (MongoDB) from a csv file
+------------------------------------------------
+Prerequisites
+-------------
+    - CMake
+    - C++ Compiler(GCC, etc.)
+    - legacy mongo-cxx-driver and a compatible MongoDB version
+        - legacy 1.1.x ( 2.4 <= MongoDB <= 3.2)
+        - legacy 1.0.x ( 2.4 <= MongoDB <= 3.0)
+
+How to run the program
+----------------------
+    - Create a directory build
+    - Go into build directory
+      $ cmake ..
+      $ make
+    - Edit application.properties in res/ directory or not to use the default configuration.
+    - This would create a file called csvMongoDB, run it like this
+          $ ./csvMongoDB example.csv

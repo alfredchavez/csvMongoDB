@@ -23,13 +23,14 @@ private:
 
     void add_to_db(const std::vector<std::string> &row);
 
-    std::vector<std::string> parse_csv_row(const std::string &str);
+    std::vector<std::string> parse_csv_row(const std::string &row);
+
+    std::pair<std::string, std::string> parse_properties_row(const std::string &row);
 
 public:
     csvcollection();
 
-    void set_parameters_connection(std::string database, std::string collection, std::string ipv4 = "localhost",
-                                   std::string port = "27017");
+    void set_parameters_connection(const std::string &properties_filename);
 
     bool populate_from_csv(const std::string &filename);
 };

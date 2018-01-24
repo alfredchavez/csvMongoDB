@@ -2,7 +2,7 @@
 // Created by alfred on 1/24/18.
 //
 #include <fstream>
-#include "../inc/csvcollection.h"
+#include "csvcollection.h"
 
 using mongo::BSONObj;
 using mongo::BSONObjBuilder;
@@ -27,7 +27,6 @@ void csvcollection::add_to_db(const std::vector<std::string> &row) {
         std::cout << "some error in counting number of columns of csv" << std::endl;
         return;
     }
-    std::cout << std::endl;
     BSONObjBuilder obj_builder;
     obj_builder.genOID();
     for (size_t i = 0; i < num_cols; ++i) {
@@ -43,19 +42,25 @@ void csvcollection::add_to_db(const std::vector<std::string> &row) {
 }
 
 void
-csvcollection::set_parameters_connection(std::string database, std::string collection, std::string ipv4,
-                                         std::string port) {
-    this->database = std::move(database);
-    this->collection = std::move(collection);
-    this->ipv4 = std::move(ipv4);
-    this->port = std::move(port);
+csvcollection::set_parameters_connection(const std::string &properties_filename) {
+    std::ifstream param_file(properties_filename);
+    std::string str_param;
+    while(!param_file.eof()){
+        getline(param_file, str_param);
+        auto param = parse_properties_row(str_param);
+        if(param.first == "ipv4") this->ipv4 = param.second;
+        if(param.first == "port") this->port = param.second;
+        if(param.first == "database") this->database = param.second;
+        if(param.first == "collection") this->collection = param.second;
+    }
+    param_file.close();
     parameters = true;
 }
 
-std::vector<std::string> csvcollection::parse_csv_row(const std::string &str) {
+std::vector<std::string> csvcollection::parse_csv_row(const std::string &row) {
     std::vector<std::string> ans;
     std::string element;
-    for (auto &el: str) {
+    for (auto &el: row) {
         if (el != ',') element += el;
         else {
             ans.push_back(element);
@@ -64,6 +69,17 @@ std::vector<std::string> csvcollection::parse_csv_row(const std::string &str) {
     }
     ans.push_back(element);
     return ans;
+}
+
+std::pair<std::string, std::string> csvcollection::parse_properties_row(const std::string &row) {
+    size_t pos = row.find('=');
+    if(pos == std::string::npos) pos = row.find(':');
+    size_t pre_eq = pos - 1, post_eq = pos + 1;
+    while(row[pre_eq]==' ' || row[pre_eq]=='\t') --pre_eq;
+    while(row[post_eq]==' ' || row[post_eq]=='\t') ++post_eq;
+    std::string attr = row.substr(0, pre_eq + 1);
+    std::string val = row.substr(post_eq);
+    return std::make_pair(attr,val);
 }
 
 bool csvcollection::populate_from_csv(const std::string &filename) {
@@ -93,4 +109,5 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
 csvcollection::csvcollection() {
     parameters = false;
 }
+
 
