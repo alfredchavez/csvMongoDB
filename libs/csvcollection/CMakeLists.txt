@@ -16,3 +16,5 @@ target_include_directories(csvcollection
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
         PUBLIC $<INSTALL_INTERFACE:inc/csvcollection>
         )
+
+add_subdirectory(test)

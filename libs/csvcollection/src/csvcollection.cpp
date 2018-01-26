@@ -1,6 +1,3 @@
-//
-// Created by alfred on 1/24/18.
-//
 #include <fstream>
 #include "csvcollection.h"
 
@@ -110,4 +107,18 @@ csvcollection::csvcollection() {
     parameters = false;
 }
 
+std::string csvcollection::get_database(){
+    return database;
+}
 
+std::string csvcollection::get_collection(){
+    return collection;
+}
+
+std::string csvcollection::get_ipv4(){
+    return ipv4;
+}
+
+std::string csvcollection::get_port(){
+    return port;
+}
