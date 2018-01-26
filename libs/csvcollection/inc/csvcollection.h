@@ -5,18 +5,18 @@
 #include <gtest/gtest_prod.h>
 #include <mongo/client/dbclient.h>
 #include <vector>
+#include "collection.h"
+
+class collection;
 
 class csvcollection {
 private:
-    std::string database;
-    std::string collection;
-    std::string ipv4;
-    std::string port;
     mongo::DBClientConnection connection;
+    collection _collection;
     std::vector<std::string> header;
     bool parameters;
 
-    bool connect_to_mongo();
+    bool connect_to_mongo(std::string ipv4, std::string port);
 
     void add_to_db(const std::vector<std::string> &row);
 
@@ -33,13 +33,9 @@ public:
 
     bool populate_from_csv(const std::string &filename);
 
-    std::string get_database();
+    std::string get_info_from_collection();
 
-    std::string get_collection();
-
-    std::string get_ipv4();
-
-    std::string get_port();
+    collection get_collection();
 };
 
 

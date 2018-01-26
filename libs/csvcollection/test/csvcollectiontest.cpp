@@ -36,8 +36,6 @@ TEST_F(csvcollectiontest, parse_properties_row_Test){
 
 TEST_F(csvcollectiontest, set_parameters_connection_Test){
   csvcollection1.set_parameters_connection("../../../res/test/application.properties");
-  EXPECT_EQ(csvcollection1.get_database(), "csvdb");
-  EXPECT_EQ(csvcollection1.get_collection(), "csvcollection");
-  EXPECT_EQ(csvcollection1.get_ipv4(), "127.0.0.1");
-  EXPECT_EQ(csvcollection1.get_port(), "27017");
+  EXPECT_EQ(csvcollection1.get_collection().database_name, "csvdb");
+  EXPECT_EQ(csvcollection1.get_collection().collection_name, "csvcollection");
 }

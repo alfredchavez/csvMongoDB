@@ -3,10 +3,12 @@ cmake_minimum_required(VERSION 3.9)
 project(csvcollection)
 
 set(HEADERS_FILES
+        inc/collection.h
         inc/csvcollection.h
         )
 
 set(SOURCES_FILES
+        src/collection.cpp
         src/csvcollection.cpp
         )
 

@@ -5,7 +5,7 @@ using mongo::BSONObj;
 using mongo::BSONObjBuilder;
 using mongo::BSONObjIterator;
 
-bool csvcollection::connect_to_mongo() {
+bool csvcollection::connect_to_mongo(std::string ipv4, std::string port) {
     mongo::HostAndPort host_and_port(ipv4, std::stoi(port));
     std::string errmsg;
     try {
@@ -14,43 +14,35 @@ bool csvcollection::connect_to_mongo() {
         std::cout << "EXCEPTION IN CONNECTION: " << e.what() << ", " << errmsg << std::endl;
         return false;
     }
-    std::cout << "Connected" << std::endl;
     return true;
 }
 
 void csvcollection::add_to_db(const std::vector<std::string> &row) {
     size_t num_cols = header.size();
     if (row.size() != num_cols) {
-        std::cout << "some error in counting number of columns of csv" << std::endl;
+        std::cout << "some error in counting number of columns";
         return;
     }
-    BSONObjBuilder obj_builder;
-    obj_builder.genOID();
-    for (size_t i = 0; i < num_cols; ++i) {
-        obj_builder.append(header.at(i), row.at(i));
+    std::vector<std::pair<std::string, std::string> > row_ins;
+    for(size_t i=0; i < num_cols; ++i){
+      row_ins.push_back(std::make_pair(header.at(i),row.at(i)));
     }
-    BSONObj obj = obj_builder.obj();
-    connection.insert(database + "." + collection, obj);
-    std::cout << "Inserted row: ";
-    for(const auto &i: row){
-        std::cout << i << ' ';
-    }
-    std::cout << std::endl;
+    _collection.insert_document(row_ins);
 }
 
-void
-csvcollection::set_parameters_connection(const std::string &properties_filename) {
+void csvcollection::set_parameters_connection(const std::string &properties_filename) {
     std::ifstream param_file(properties_filename);
-    std::string str_param;
+    std::string str_param, ipv4,port,database,collection;
     while(!param_file.eof()){
         getline(param_file, str_param);
         auto param = parse_properties_row(str_param);
-        if(param.first == "ipv4") this->ipv4 = param.second;
-        if(param.first == "port") this->port = param.second;
-        if(param.first == "database") this->database = param.second;
-        if(param.first == "collection") this->collection = param.second;
+        if(param.first == "ipv4") ipv4 = param.second;
+        if(param.first == "port") port = param.second;
+        if(param.first == "database") database = param.second;
+        if(param.first == "collection") collection = param.second;
     }
-    param_file.close();
+    connect_to_mongo(ipv4, port);
+    _collection.set_collection(connection, database,collection);
     parameters = true;
 }
 
@@ -84,8 +76,7 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
         std::cout << "Please set parameters of connection before inserting" << std::endl;
         return false;
     }
-    if (!connect_to_mongo()) return false;
-    connection.remove(database + "." + collection, BSONObj());
+    if(!_collection.empty_collection()) return false;
     std::ifstream reader(filename);
     std::string hdr;
     if (!reader.eof()) getline(reader, hdr);
@@ -93,32 +84,20 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
     std::string row;
     while (!reader.eof()) {
         getline(reader, row);
+        if(row=="")continue;
         add_to_db(parse_csv_row(row));
     }
-    std::cout << "Info" << std::endl;
-    auto vec = connection.getCollectionInfos(database,BSONObj());
-    for(auto &i: vec){
-        std::cout << i << std::endl;
-    }
-    reader.close();
+}
+
+std::string csvcollection::get_info_from_collection(){
+    return _collection.info();
+}
+
+collection csvcollection::get_collection(){
+    return _collection;
 }
 
 csvcollection::csvcollection() {
     parameters = false;
 }
 
-std::string csvcollection::get_database(){
-    return database;
-}
-
-std::string csvcollection::get_collection(){
-    return collection;
-}
-
-std::string csvcollection::get_ipv4(){
-    return ipv4;
-}
-
-std::string csvcollection::get_port(){
-    return port;
-}
