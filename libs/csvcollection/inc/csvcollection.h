@@ -17,10 +17,8 @@ private:
     bool parameters;
 
     bool connect_to_mongo();
-    FRIEND_TEST(csvcollectiontest, connect_to_mongo_Test);
 
     void add_to_db(const std::vector<std::string> &row);
-    FRIEND_TEST(csvcollectiontest, add_to_db_Test);
 
     std::vector<std::string> parse_csv_row(const std::string &row);
     FRIEND_TEST(csvcollectiontest, parse_csv_row_Test);
