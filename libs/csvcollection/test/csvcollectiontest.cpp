@@ -35,7 +35,7 @@ TEST_F(csvcollectiontest, parse_csv_row_Test){
   EXPECT_EQ(ans.at(0), "1999");
   EXPECT_EQ(ans.at(1), "Chevy");
   EXPECT_EQ(ans.at(2), "Venture \"Extended Edition\"");
-  EXPECT_EQ(ans.at(3), "\"");
+  EXPECT_EQ(ans.at(3), "");
   EXPECT_EQ(ans.at(4), "4900.00");
 }
 

@@ -43,7 +43,7 @@ void csvcollection::add_csv(const std::string &filename, int hdrsize){
         csv.read(buffer, 4096);
         std::streamsize read_size  = csv.gcount();
         itr = read_size - 1;
-        while(itr > -1 && buffer[itr]!='\n');
+        while(itr > -1 && buffer[itr]!='\n')--itr;
         for(int i = 0; i <= itr; ++i){
             block+=buffer[i];
         }
@@ -94,7 +94,7 @@ std::vector<std::string> csvcollection::parse_csv_row(const std::string &row) {
     while(itr < row.length()){
         if(row[itr]=='\"'){
             if(itr+1 < row.length()){
-                if(row[itr+1]=='\"'){
+                if(row[itr+1]=='\"' && openquote){
                     element += '\"';
                     ++itr;
                 }
