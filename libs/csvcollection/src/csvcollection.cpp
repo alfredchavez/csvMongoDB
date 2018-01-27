@@ -1,3 +1,4 @@
+#include <chrono>
 #include <fstream>
 #include "csvcollection.h"
 
@@ -138,17 +139,26 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
         return false;
     }
     if(!_collection.empty_collection()) return false;
+    //
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    //
     std::ifstream reader(filename);
     std::string hdr;
     if (!reader.eof()) getline(reader, hdr);
     header = std::move(parse_csv_row(hdr));
     reader.close();
     add_csv(filename, hdr.length());
+    //
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    //
+    auto duration_ms = (double)(std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count());
+    info += "time: " + std::to_string(duration_ms/1000.0) + "\n";
     return true;
 }
 
 std::string csvcollection::get_info_from_collection(){
-    return _collection.info();
+    info +=  _collection.info() + "\n";
+    return info;
 }
 
 collection csvcollection::get_collection(){
@@ -157,5 +167,6 @@ collection csvcollection::get_collection(){
 
 csvcollection::csvcollection() {
     parameters = false;
+    info = "";
 }
 

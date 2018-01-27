@@ -13,5 +13,6 @@ int main(int argc, char** argv) {
     csvcollection csvcollection1;
     csvcollection1.set_parameters_connection(file2);
     csvcollection1.populate_from_csv(file);
+    std::cout << csvcollection1.get_info_from_collection() << std::endl;
     return 0;
 }

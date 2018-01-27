@@ -1,4 +1,5 @@
 #include <mongo/client/dbclient.h>
+#include <string>
 #include "collection.h"
 
 using mongo::BSONObj;
@@ -9,6 +10,8 @@ void collection::set_collection(mongo::DBClientConnection &conn, const std::stri
     connection = &conn;
     database_name = db_name;
     collection_name = coll_name;
+    ins_success = 0;
+    ins_failed = 0;
 }
 
 bool collection::empty_collection(){
@@ -33,11 +36,16 @@ bool collection::insert_document(const std::vector<std::pair<std::string, std::s
         (*connection).insert(database_name + "." + collection_name, obj);
     } catch (mongo::DBException &exception){
         std::cout << "Exception: " << exception.what() << std::endl;
+        ++ins_failed;
         return false;
     }
+    ++ins_success;
     return true;
 }
 
 std::string collection::info(){
-    return "";
+    inf = "successful insertions: " + std::to_string(ins_success);
+    inf += "\nfailed insertions: " + std::to_string(ins_failed);
+    inf += "\nTotal tried: " + std::to_string(ins_success + ins_failed);
+    return inf;
 }

@@ -5,6 +5,7 @@
 #include <gtest/gtest_prod.h>
 #include <mongo/client/dbclient.h>
 #include <vector>
+#include <string>
 #include "collection.h"
 
 class collection;
@@ -15,6 +16,7 @@ private:
     collection _collection;
     std::vector<std::string> header;
     bool parameters;
+    std::string info;
 
     bool connect_to_mongo(std::string ipv4, std::string port);
 
@@ -40,6 +42,7 @@ public:
     std::string get_info_from_collection();
 
     collection get_collection();
+
 };
 
 

@@ -7,8 +7,11 @@
 class collection{
 public:
     mongo::DBClientConnection* connection;
+    std::string inf;
     std::string database_name;
     std::string collection_name;
+    long ins_success;
+    long ins_failed;
     void set_collection(mongo::DBClientConnection &conn,const std::string &db_name, const std::string &coll_name);
     bool empty_collection();
     bool insert_document(const std::vector<std::pair<std::string,std::string> > &rows);
