@@ -4,7 +4,6 @@ project(csvcollectiontest)
 
 set(TEST_FILES
         csvcollectiontest.cpp
-        collectiontest.cpp
 )
 
 enable_testing()

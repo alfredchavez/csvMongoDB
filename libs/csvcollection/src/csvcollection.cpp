@@ -54,7 +54,6 @@ void csvcollection::add_csv(const std::string &filename, int hdrsize){
         block = remain;
         remain = "";
     }
-    std::cout << csv.gcount() << std::endl;
     csv.close();
 }
 
@@ -152,7 +151,7 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     //
     auto duration_ms = (double)(std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count());
-    info += "time: " + std::to_string(duration_ms/1000.0) + "\n";
+    info += "time: " + std::to_string(duration_ms/1000.0) + " ms\n";
     return true;
 }
 
