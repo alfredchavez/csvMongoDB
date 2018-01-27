@@ -17,6 +17,8 @@ private:
     std::vector<std::string> header;
     bool parameters;
     std::string info;
+    char delim;
+    long wrong_rows, good_rows, total_rows;
 
     bool connect_to_mongo(std::string ipv4, std::string port);
 
@@ -33,6 +35,8 @@ private:
     FRIEND_TEST(csvcollectiontest, parse_properties_row_Test);
 
 public:
+    csvcollection(char delimiter);
+
     csvcollection();
 
     void set_parameters_connection(const std::string &properties_filename);
@@ -42,7 +46,6 @@ public:
     std::string get_info_from_collection();
 
     collection get_collection();
-
 };
 
 

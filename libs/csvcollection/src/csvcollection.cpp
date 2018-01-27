@@ -20,16 +20,22 @@ bool csvcollection::connect_to_mongo(std::string ipv4, std::string port) {
 
 void csvcollection::add_to_db(const std::vector<std::string> &row) {
     size_t num_cols = header.size();
+    ++total_rows;
     if (row.size() != num_cols) {
-        std::cout << "some error in counting number of columns";
-        std::cout << row[0] << " " <<row.size() << " != " << num_cols;
+        for(auto &i: row)std::cout << i << " , ";
+        //std::cout << ".....";
+        //std::cout << std::endl;
+        //std::cout << "some error in counting number of columns -> ";
+        std::cout << row[0] << " --- --- " <<row.size() << " != " << num_cols;
         std::cout << std::endl;
+        ++wrong_rows;
         return;
     }
     std::vector<std::pair<std::string, std::string> > row_ins;
     for(size_t i=0; i < num_cols; ++i){
       row_ins.push_back(std::make_pair(header.at(i),row.at(i)));
     }
+    ++good_rows;
     _collection.insert_document(row_ins);
 }
 
@@ -39,11 +45,12 @@ void csvcollection::add_csv(const std::string &filename, int hdrsize){
     char buffer[4096];
     std::string block, remain;
     int itr;
+    //std::cout << "WHILEi " << hdrsize  <<std::endl;
     while(!csv.eof()){
         csv.read(buffer, 4096);
         std::streamsize read_size  = csv.gcount();
         itr = read_size - 1;
-        while(itr > -1 && buffer[itr]!='\n')--itr;
+        while(itr > -1 && buffer[itr]!=delim)--itr;
         for(int i = 0; i <= itr; ++i){
             block+=buffer[i];
         }
@@ -59,8 +66,9 @@ void csvcollection::add_csv(const std::string &filename, int hdrsize){
 
 void csvcollection::add_block(const std::string &block){
     std::string row;
+    //std::cout << "BLOCK" << block << std::endl;
     for(auto& ch: block){
-        if(ch != '\n')row+=ch;
+        if(ch != 13 && ch!= 10)row+=ch;
         else {
             if(row=="")continue;
             else add_to_db(parse_csv_row(row));
@@ -143,7 +151,7 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
     //
     std::ifstream reader(filename);
     std::string hdr;
-    if (!reader.eof()) getline(reader, hdr);
+    if (!reader.eof()) std::getline(reader, hdr, delim);
     header = std::move(parse_csv_row(hdr));
     reader.close();
     add_csv(filename, hdr.length());
@@ -157,6 +165,9 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
 
 std::string csvcollection::get_info_from_collection(){
     info +=  _collection.info() + "\n";
+    info += "well formatted rows : " + std::to_string(good_rows) + "\n";
+    info += "bad formatted rows : " + std::to_string(wrong_rows) + "\n";
+    info += "total rows : " + std::to_string(total_rows) + "\n";
     return info;
 }
 
@@ -164,8 +175,20 @@ collection csvcollection::get_collection(){
     return _collection;
 }
 
-csvcollection::csvcollection() {
+csvcollection::csvcollection(char delimiter) {
+    wrong_rows = 0;
+    good_rows = 0;
+    total_rows = 0;
     parameters = false;
     info = "";
+    delim = delimiter;
 }
 
+csvcollection::csvcollection() {
+    wrong_rows = 0;
+    good_rows = 0;
+    total_rows = 0;
+    parameters = false;
+    info = "";
+    delim = '\n';
+}

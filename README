@@ -20,4 +20,8 @@ How to run the program
       $ make
     - Edit application.properties in res/ directory or not to use the default configuration.
     - This would create a file called csvMongoDB, run it like this
-          $ ./csvMongoDB example.csv
+          $ ./csvMongoDB <csv file> <format>
+          - Where:
+            - csv file: It is the csv file you want to process
+            - format(mac, dos, unix): According the endline type of your csv
+              file(\r: mac, \r\n: dos, \n:unix)
