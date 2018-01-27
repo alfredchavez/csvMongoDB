@@ -21,6 +21,8 @@ void csvcollection::add_to_db(const std::vector<std::string> &row) {
     size_t num_cols = header.size();
     if (row.size() != num_cols) {
         std::cout << "some error in counting number of columns";
+        std::cout << row[0] << " " <<row.size() << " != " << num_cols;
+        std::cout << std::endl;
         return;
     }
     std::vector<std::pair<std::string, std::string> > row_ins;
@@ -28,6 +30,44 @@ void csvcollection::add_to_db(const std::vector<std::string> &row) {
       row_ins.push_back(std::make_pair(header.at(i),row.at(i)));
     }
     _collection.insert_document(row_ins);
+}
+
+void csvcollection::add_csv(const std::string &filename, int hdrsize){
+    std::ifstream csv(filename, std::ifstream::binary);
+    csv.ignore(hdrsize + 1);
+    char buffer[4096];
+    std::string block, remain;
+    int itr;
+    while(!csv.eof()){
+        csv.read(buffer, 4096);
+        std::streamsize read_size  = csv.gcount();
+        itr = read_size - 1;
+        while(itr > -1 && buffer[itr]!='\n');
+        for(int i = 0; i <= itr; ++i){
+            block+=buffer[i];
+        }
+        for(int i = itr+1; i < read_size; ++i){
+            remain+=buffer[i];
+        }
+        add_block(block);
+        block = remain;
+        remain = "";
+    }
+    std::cout << csv.gcount() << std::endl;
+    csv.close();
+}
+
+void csvcollection::add_block(const std::string &block){
+    std::string row;
+    for(auto& ch: block){
+        if(ch != '\n')row+=ch;
+        else {
+            if(row=="")continue;
+            else add_to_db(parse_csv_row(row));
+            row = "";
+        }
+    }
+    if(row!="")add_to_db(parse_csv_row(row));
 }
 
 void csvcollection::set_parameters_connection(const std::string &properties_filename) {
@@ -49,12 +89,33 @@ void csvcollection::set_parameters_connection(const std::string &properties_file
 std::vector<std::string> csvcollection::parse_csv_row(const std::string &row) {
     std::vector<std::string> ans;
     std::string element;
-    for (auto &el: row) {
-        if (el != ',') element += el;
-        else {
-            ans.push_back(element);
-            element = "";
+    bool openquote = false;
+    int itr = 0;
+    while(itr < row.length()){
+        if(row[itr]=='\"'){
+            if(itr+1 < row.length()){
+                if(row[itr+1]=='\"'){
+                    element += '\"';
+                    ++itr;
+                }
+                else{
+                    openquote = !openquote;
+                }
+            } else {
+                openquote = !openquote;
+            }
+        } else {
+            if(row[itr]==','){
+                if(openquote) element += row[itr];
+                else {
+                    ans.push_back(element);
+                    element="";
+                }
+            } else {
+                element += row[itr];
+            }
         }
+        ++itr;
     }
     ans.push_back(element);
     return ans;
@@ -81,12 +142,9 @@ bool csvcollection::populate_from_csv(const std::string &filename) {
     std::string hdr;
     if (!reader.eof()) getline(reader, hdr);
     header = std::move(parse_csv_row(hdr));
-    std::string row;
-    while (!reader.eof()) {
-        getline(reader, row);
-        if(row=="")continue;
-        add_to_db(parse_csv_row(row));
-    }
+    reader.close();
+    add_csv(filename, hdr.length());
+    return true;
 }
 
 std::string csvcollection::get_info_from_collection(){

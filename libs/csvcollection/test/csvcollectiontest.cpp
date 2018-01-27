@@ -14,12 +14,29 @@ TEST_F(csvcollectiontest, parse_csv_row_Test){
   std::string teststr = "alfred,chavez,19,aqp,1232424,lunaStr";
   std::vector<std::string> ans;
   ans = csvcollection1.parse_csv_row(teststr);
+  EXPECT_EQ(ans.size(), 6);
   EXPECT_EQ(ans.at(0), "alfred");
   EXPECT_EQ(ans.at(1), "chavez");
   EXPECT_EQ(ans.at(2), "19");
   EXPECT_EQ(ans.at(3), "aqp");
   EXPECT_EQ(ans.at(4), "1232424");
   EXPECT_EQ(ans.at(5), "lunaStr");
+  teststr = "1999,Chevy,\"Venture \"\"Extended Edition, Very Large\"\"\",,5000.00";
+  ans = csvcollection1.parse_csv_row(teststr);
+  EXPECT_EQ(ans.size(), 5);
+  EXPECT_EQ(ans.at(0), "1999");
+  EXPECT_EQ(ans.at(1), "Chevy");
+  EXPECT_EQ(ans.at(2), "Venture \"Extended Edition, Very Large\"");
+  EXPECT_EQ(ans.at(3), "");
+  EXPECT_EQ(ans.at(4), "5000.00");
+  teststr = "1999,Chevy,\"Venture \"\"Extended Edition\"\"\",\"\",4900.00";
+  ans = csvcollection1.parse_csv_row(teststr);
+  EXPECT_EQ(ans.size(), 5);
+  EXPECT_EQ(ans.at(0), "1999");
+  EXPECT_EQ(ans.at(1), "Chevy");
+  EXPECT_EQ(ans.at(2), "Venture \"Extended Edition\"");
+  EXPECT_EQ(ans.at(3), "\"");
+  EXPECT_EQ(ans.at(4), "4900.00");
 }
 
 TEST_F(csvcollectiontest, parse_properties_row_Test){

@@ -20,6 +20,10 @@ private:
 
     void add_to_db(const std::vector<std::string> &row);
 
+    void add_csv(const std::string &filename, int hdrsize);
+
+    void add_block(const std::string &block);
+
     std::vector<std::string> parse_csv_row(const std::string &row);
     FRIEND_TEST(csvcollectiontest, parse_csv_row_Test);
 
